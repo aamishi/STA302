@@ -1,25 +1,32 @@
 ---
 title: "mini_essay_2"
-author: "Aamishi Avarsekar"
+author: "Aamishi Avarsekar, 1007339364"
 format: html
 editor: visual
 ---
 
 ## Week 02: Mini Essay 2
 
+### Short term rentals in Toronto:
+Short term rentals refer to the procedure of renting out a dwelling or a part of it in monetary exchange. In this mini-essay, I will aim to understand what type of rental property is most likely to be rented out in a short term period and create a graph for the number of rentals for each of the property types.
+
 ## Setting up the work space
+Here I am simply downloading all the required resources so that this file is as reproducible as possible.
 
 ```{r}
 #| echo: false
 install.packages("opendatatoronto")
 install.packages("knitr")
-library("opendatatoronto")
-library(dplyr)
+
 library(knitr)
+library(janitor)
+library(lubridate)
+library(opendatatoronto)
 library(tidyverse)
 ```
 
 ## Acquiring a dataset from opendatatoronto
+As instructed, I identified a dataset from "opendatatoronto" that I would like to work with. First, I will load it and then I will clean the dataset for further use.
 
 
 ```{r}
@@ -35,15 +42,65 @@ write_csv(
 )
 head(short_term_rentals)
 ```
+As seen in the textbook, I called the opendatatoronto website's API and loaded the dataset directly onto the project so that it is easier to reproduce it by someone else.
+
+With a quick look at the dataset using head() we can see that all our required data is listed in the dataset. Although it is quite messy to look at and contains a lot of extra information that does not pertain to our example. I will clean it so that is much more readable and contains only relevent columns.
+
 ## Cleaning the Short Term Rentals of Toronto Dataset
 
 ```{r}
-###short_term_rentals_clean <-
-#  clean_names(short_term_rentals) |>
-#   select(property_type, postal_code)
+short_term_rentals_clean <-
+  clean_names(short_term_rentals) |>
+   select(x_id, property_type)
 
-#head(toronto_shelters_clean)
+head(short_term_rentals_clean)
 ```
+
+Using the janitor library's clean_names() function, I have made all the required column names' to have a more uniform look and case. I have also selected the ID of each property for easy identification and its type. I have shortened the cleaning step to include both cleaner names and relevant columns to make the steps easier to keep track of. With a simple look at the first 6 values of the dataset, I have noticed that names like "Townhouse/ Row House" and "Duplex/Triplex/Fourplex" add unneccary information and increases the complexity of the data. We can rename the property types to have a simpler and one-worded name.
+
+## Simplifying the property names
+```{r}
+short_term_rentals_clean$property_type |>
+  unique()
+
+short_term_rentals_clean <-
+  short_term_rentals_clean |>
+  mutate(
+    property_type =
+      case_match(
+        property_type,
+        "Townhouse/ Row House" ~ "Townhouse",
+        "Duplex/Triplex/Fourplex" ~ "Multifamily",
+        "Single/Semi-detached House" ~ "Single",
+        "Condominium"~"Condo"
+      )
+  )
+
+head(short_term_rentals_clean)
+```
+We first identify all the lables that need renaming and choose an appropriate shorter name for each. Now it would be beneficial to save this current data that we must work with to maintain high reproduciblity. 
+
+```{r}
+write_csv(
+  x = short_term_rentals_clean,
+  file = "short_term_rentals_clean.csv"
+)
+```
+
+## Exploring the data and visualising it
+
+Now that we have achieved cleaning our data we can look into visualising it. One of the easiest ways is to create a bar graph and observe the highest count for the property types.
+
+```{r}
+short_term_rentals_clean |>
+  ggplot(aes(x = property_type)) +
+  geom_bar() + 
+  labs(x = "Property type", y = "Number of short term rentals") # Make labels more meaningful
+```
+
+As one might expect, single properties are the most popular and frequently rented out short-term rentals in Toronto.
+
+
 
 
 
