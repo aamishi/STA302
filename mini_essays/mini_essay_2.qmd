@@ -1,0 +1,49 @@
+---
+title: "mini_essay_2"
+author: "Aamishi Avarsekar"
+format: html
+editor: visual
+---
+
+## Week 02: Mini Essay 2
+
+## Setting up the work space
+
+```{r}
+#| echo: false
+install.packages("opendatatoronto")
+install.packages("knitr")
+library("opendatatoronto")
+library(dplyr)
+library(knitr)
+library(tidyverse)
+```
+
+## Acquiring a dataset from opendatatoronto
+
+
+```{r}
+short_term_rentals <- 
+  list_package_resources("2ab20f80-3599-486a-8f8a-9cb59117977c") |>
+  filter(name == 
+    "short-term-rental-registrations-data.csv") |>
+    get_resource()
+
+write_csv(
+  x = short_term_rentals,
+  file = "short_term_rentals.csv"
+)
+head(short_term_rentals)
+```
+## Cleaning the Short Term Rentals of Toronto Dataset
+
+```{r}
+###short_term_rentals_clean <-
+#  clean_names(short_term_rentals) |>
+#   select(property_type, postal_code)
+
+#head(toronto_shelters_clean)
+```
+
+
+
